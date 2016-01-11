@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-6.0.2.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-linux32-6.0.2.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-linux64-6.0.2.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-mac-6.0.2.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-win-6.0.2.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/license.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
