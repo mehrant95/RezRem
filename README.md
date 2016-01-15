@@ -5,6 +5,7 @@
 
 * [JxBrowser](https://www.teamdev.com/jxbrowser) : Used as app GUI.
 * [Apache HttpClient](https://hc.apache.org/httpcomponents-client-ga/index.html): A library used to perform HTTP GET/POST request.
+* [Materialize](http://materializecss.com) : A modern responsive CSS framework based on Material Design by Google.
 
 ## JxBrowser
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TeamDev](https://www.teamdev.com) Chromium-based Swing/JavaFX component, used to display modern web pages built with HTML5, CSS3, JavaScript, Flash, Silverlight etc. TeamDev also offers __free license for open source projects__ which is used in RezRem.

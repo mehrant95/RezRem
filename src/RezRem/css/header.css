@@ -1,0 +1,17 @@
+body > header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    background-color: black;
+}
+
+body > header img {
+    float: right;
+    cursor: pointer;
+}
+
+#close-btn-hover,
+#minimize-btn-hover {
+    display: none;
+}
