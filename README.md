@@ -8,7 +8,7 @@
 * [Materialize](http://materializecss.com) : A modern responsive CSS framework based on Material Design by Google.
 
 ## JxBrowser
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TeamDev](https://www.teamdev.com) Chromium-based Swing/JavaFX component, used to display modern web pages built with HTML5, CSS3, JavaScript, Flash, Silverlight etc. TeamDev also offers __free license for open source projects__.RezRem uses [JxBrowser](http://www.teamdev.com/jxbrowser), which is a proprietary software. The use of JxBrowser is governed by [JxBrowser Product Licence Agreement](http://www.teamdev.com/jxbrowser-licence-agreement). If you would like to use JxBrowser in your development, please contact TeamDev.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[TeamDev](https://www.teamdev.com) Chromium-based Swing/JavaFX component, used to display modern web pages built with HTML5, CSS3, JavaScript, Flash, Silverlight etc. TeamDev also offers __free license for open source projects__. RezRem uses [JxBrowser](http://www.teamdev.com/jxbrowser), which is a proprietary software. The use of JxBrowser is governed by [JxBrowser Product Licence Agreement](http://www.teamdev.com/jxbrowser-licence-agreement). If you would like to use JxBrowser in your development, please contact TeamDev.
 
 ## Supported Java Versions
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Oracle Java 8.
