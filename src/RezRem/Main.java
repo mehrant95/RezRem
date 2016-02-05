@@ -1,5 +1,22 @@
 package RezRem;
 
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserFunction;
 import com.teamdev.jxbrowser.chromium.JSValue;
@@ -9,7 +26,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 import javafx.application.Platform;
 
 public class Main extends Application {
@@ -17,6 +33,12 @@ public class Main extends Application {
 	private Stage primaryStage;
 	
 	private Browser browser;
+	
+	private boolean firstMinimize;
+	
+    private TrayIcon trayIcon;
+    
+    private File config;
 	
 	public static void main(String[] args) {
 		
@@ -28,6 +50,12 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		
 		this.primaryStage = primaryStage;
+		
+		firstMinimize = true;
+		
+		Platform.setImplicitExit(false);
+		
+		createTrayIcon();
 		
 		browser = new Browser();
 		
@@ -47,9 +75,31 @@ public class Main extends Application {
 		
 		initialize();
 		
-		// if not logged in
+		// read user name & password file
 		
-		showLogin();
+		config = new File("src/RezRem/user.config");
+		
+		if(!config.exists()) {
+			
+		    try {
+		    	
+				config.createNewFile();
+				
+				showLogin();
+				
+				
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			
+			}
+		    
+		}
+		else if (!config.isDirectory()) {
+			
+			// login to dining
+			
+		}
 		
 	}
 	
@@ -73,12 +123,8 @@ public class Main extends Application {
 					@Override
 					public void run() {
 						
-						primaryStage.fireEvent(
-							    new WindowEvent(
-							        primaryStage,
-							        WindowEvent.WINDOW_CLOSE_REQUEST
-							    )
-							);	
+						closeToTray(primaryStage);
+						
 					}
 				});
 				
@@ -114,6 +160,127 @@ public class Main extends Application {
 		});
 		
 	}
+
+	
+	public void createTrayIcon() {
+        
+		if (SystemTray.isSupported()) {
+			
+            SystemTray tray = SystemTray.getSystemTray();
+            
+            final ActionListener closeListener = new ActionListener() {
+                
+            	@Override
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    
+            		System.exit(0);
+                
+            	}
+            
+            };
+
+            final ActionListener showListener = new ActionListener() {
+                
+            	@Override
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+            		
+            		Platform.runLater(new Runnable() {
+                        
+            			@Override
+                        public void run() {
+                            
+            				primaryStage.show();
+            				
+            			}
+                    
+            		});
+                
+            	}
+            
+            };
+
+            PopupMenu popup = new PopupMenu();
+
+            MenuItem showItem = new MenuItem("Show");
+            showItem.addActionListener(showListener);
+            popup.add(showItem);
+
+            MenuItem closeItem = new MenuItem("Close");
+            closeItem.addActionListener(closeListener);
+            popup.add(closeItem);
+            
+            
+            BufferedImage trayIconImage;
+            
+			try {
+				
+				trayIconImage = ImageIO.read(new FileInputStream("src/RezRem/img/R2_Logo.png"));
+				
+				int trayIconHeight = new TrayIcon(trayIconImage).getSize().height;
+				
+				int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
+				
+	            trayIcon = new TrayIcon(trayIconImage.getScaledInstance(trayIconWidth, trayIconHeight, Image.SCALE_SMOOTH), "RezRem", popup);
+	            
+	            trayIcon.addActionListener(showListener);
+	            
+	            try {
+	                
+	            	tray.add(trayIcon);
+	            
+	            } catch (AWTException e) {
+	                
+	            	System.err.println(e);
+	            
+	            }
+	            
+				
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+            
+        }
+		
+    }
+
+    public void showMinimizeMessage() {
+        
+    	if (firstMinimize) {
+            
+    		trayIcon.displayMessage("RezRem",
+                    "RezRem is running in background.",
+                    TrayIcon.MessageType.INFO);
+            
+    		firstMinimize = false;
+        
+    	}
+    	
+    }
+
+    private void closeToTray(Stage primaryStage) {
+    	
+        Platform.runLater(new Runnable() {
+            
+        	@Override
+            
+        	public void run() {
+                
+        		if (SystemTray.isSupported()) {
+                    
+        			primaryStage.hide();
+        			
+                    showMinimizeMessage();
+                    
+                } 
+        		else {
+        			
+                    System.exit(0);
+                
+        		}
+        		
+            }
+        });
+    }
 	
 	public void showLogin() {
 		
@@ -124,11 +291,30 @@ public class Main extends Application {
 			@Override
 			public JSValue invoke(JSValue... args) {
 				
-				
-				
 				for (JSValue arg : args) {
 					
 					System.out.println("arg = " + arg.getString());
+					
+					try {
+						
+						FileOutputStream oFile = new FileOutputStream(config, false);
+						
+						FileWriter writer = new FileWriter(config);
+						
+						writer.write("salam");
+						
+						writer.flush();
+						
+						writer.close();
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					
 					
 				}
 				

@@ -35,4 +35,8 @@
         Close();
     });
 
+    minimize_btn_hover.on('click', function () {
+        Minimize();
+    });
+
 })(jQuery);
