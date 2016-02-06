@@ -8,12 +8,14 @@ import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
 
@@ -40,6 +42,8 @@ public class Main extends Application {
     
     private File config;
 	
+    private Dining dining;
+    
 	public static void main(String[] args) {
 		
 		launch(args);
@@ -75,29 +79,42 @@ public class Main extends Application {
 		
 		initialize();
 		
+		dining = new Dining();
+		
 		// read user name & password file
 		
 		config = new File("src/RezRem/user.config");
 		
 		if(!config.exists()) {
 			
-		    try {
-		    	
-				config.createNewFile();
-				
-				showLogin();
-				
-				
-			} catch (IOException e) {
-				
-				e.printStackTrace();
-			
-			}
+			showLogin();
 		    
 		}
 		else if (!config.isDirectory()) {
 			
 			// login to dining
+			
+			try {
+				
+				BufferedReader br = new BufferedReader(new FileReader(config));
+				
+				String u_str = br.readLine();
+				
+				String p_str = br.readLine();
+				
+				br.close();
+				
+				dining.setUserName(u_str.split("=")[1]);
+				
+				dining.setPassword(p_str.split("=")[1]);
+				
+				doLogin();
+				
+			} catch (Exception e) {
+				
+				// handler
+				
+			}
 			
 		}
 		
@@ -289,32 +306,17 @@ public class Main extends Application {
 		browser.registerFunction("Login", new BrowserFunction() {
 			
 			@Override
-			public JSValue invoke(JSValue... args) {
+			public JSValue invoke(JSValue... args) {				
 				
-				for (JSValue arg : args) {
+				if (args.length >= 2) {
 					
-					System.out.println("arg = " + arg.getString());
+					JSValue[] arr = args.clone();
 					
-					try {
-						
-						FileOutputStream oFile = new FileOutputStream(config, false);
-						
-						FileWriter writer = new FileWriter(config);
-						
-						writer.write("salam");
-						
-						writer.flush();
-						
-						writer.close();
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					dining.setUserName(arr[0].getString());
 					
+					dining.setPassword(arr[1].getString());
 					
+					doLogin();
 					
 				}
 				
@@ -323,6 +325,118 @@ public class Main extends Application {
 			}
 			
 		});
+		
+	}
+	
+	public void doLogin() {
+		
+		final Task task = new Task();
+		
+		task.setTask(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				task.setResult(dining.logIn());
+				
+			}
+			
+		});
+		
+		task.setCallBack(new CallBack() {
+			
+			@Override
+			public void OnComplete(boolean success) {
+				
+				if (success) {
+				
+					if (!config.exists()) {
+						
+						try {
+							
+							config.createNewFile();
+							
+							FileWriter writer = new FileWriter(config);
+							
+							writer.write(EncryptUtils.encode("username=" + dining.getUserName()) + "\n");
+							
+							writer.write(EncryptUtils.encode("password=" + dining.getPassword()) + "\n");
+							
+							writer.flush();
+						
+							writer.close();
+							
+						} catch (FileNotFoundException e) {
+							
+							e.printStackTrace();
+					
+						} catch (IOException e) {
+						
+							e.printStackTrace();
+					
+						}
+						
+					}
+					
+				} else {
+					
+					//handler
+					
+				}
+				
+			}
+			
+		});
+		
+		new Thread(task).start();
+		
+	}
+	
+}
+
+interface CallBack {
+	
+	public void OnComplete(boolean success);
+	
+}
+
+class Task implements Runnable {
+	
+	private CallBack callBack;
+	
+	private Runnable task;
+	
+	private final AtomicBoolean result;
+	
+	public Task() {
+		
+		result = new AtomicBoolean();
+		
+	}
+	
+	public void run() {
+		
+		task.run();
+		
+		callBack.OnComplete(result.get());
+		
+	}
+	
+	public void setTask(Runnable task) {
+		
+		this.task = task;
+		
+	}
+	
+	public void setCallBack(CallBack callBack) {
+		
+		this.callBack = callBack;
+		
+	}
+	
+	public void setResult(boolean result) {
+		
+		this.result.set(result);
 		
 	}
 	
