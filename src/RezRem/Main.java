@@ -434,11 +434,11 @@ public class Main extends Application {
 					
 						}
 						
-						loadMainTemplate();
-						
-						loadMenu();
-						
 					}
+					
+					loadMainTemplate();
+					
+					loadMenu();
 					
 				} else {
 					
@@ -491,33 +491,33 @@ public class Main extends Application {
 	
 	public void loadMainTemplate() {
 		
-		if (main_template_file.exists() && !main_template_file.isDirectory()) {
+		if (main_template_str == null) {
 			
-			try {
-				
-				Scanner scanner = new Scanner(main_template_file);
-				
-				main_template_str = scanner.useDelimiter("\\Z").next();
-				
-				scanner.close();
-				
-				System.out.println(main_template_str);
-				
-			} catch (FileNotFoundException e) {
-				
-				e.printStackTrace();
-				
+			if (main_template_file.exists() && !main_template_file.isDirectory()) {
+			
+				try {
+					
+					Scanner scanner = new Scanner(main_template_file);
+					
+					main_template_str = scanner.useDelimiter("\\Z").next();
+					
+					scanner.close();
+					
+				} catch (FileNotFoundException e) {
+					
+					e.printStackTrace();
+					
+				}
+			
 			}
 			
 		}
-		
-		
 		
 	}
 	
 	public void loadMenu() {
 		
-		browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
+		browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
 		
 	}
 	

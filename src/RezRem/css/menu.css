@@ -1,7 +1,45 @@
 #menu {
+    overflow: hidden;
+    margin: 0;
     text-align: right;
 }
 
-#menu ul li a {
+#menu li.disabled .collapsible-body {
+    display: none !important;
+}
+
+.collapsible-header {
+    background-color: transparent;
+    border-bottom: none;
+    color: rgba(255, 255, 255, 0.41);
+    transition: all ease 0.5s;
+}
+
+.collapsible-header:hover,  li.active .collapsible-header {
+    color: rgb(255, 255, 255);
+    background-color: black;
+}
+
+.collapsible.popout > li {
+    box-shadow: none;
+}
+
+.collapsible-body .btn-flat {
     width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.32);
+}
+
+.collapsible-body .btn-flat:hover {
+    color: white;
+}
+
+.collapsible-body {
+    border-bottom: none;
+}
+
+.collapsible-body p {
+    font-size: 13px;
+    text-align: center;
+    padding: 1.5rem 0 1rem 0;
 }
