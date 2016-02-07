@@ -442,6 +442,8 @@ public class Main extends Application {
 					
 					loadMainTemplate();
 					
+					registerFunctions();
+					
 				} else {
 					
 					browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
@@ -489,6 +491,31 @@ public class Main extends Application {
 		
 		browser.executeJavaScript("$('#password').attr('value', '" + dining.getPassword() + "');");
 	
+	}
+	
+	public void registerFunctions() {
+		
+		registerExit();
+		
+	}
+	
+	public void registerExit() {
+		
+		browser.registerFunction("Exit", new BrowserFunction() {
+			
+			@Override
+			public JSValue invoke(JSValue... args) {				
+				
+				main_template_str = null;
+					
+				browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
+					
+				return null;
+				
+			}
+			
+		});
+		
 	}
 	
 	public void loadMainTemplate() {
