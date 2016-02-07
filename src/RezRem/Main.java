@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.application.Platform;
 
+
 public class Main extends Application {
 	
 	private Stage primaryStage;
@@ -70,6 +71,8 @@ public class Main extends Application {
 		pane.getChildren().add(browserView);
 		
 		Scene scene = new Scene(pane, 380, 500);
+		
+		makeDraggable(scene);
 		
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		
@@ -125,6 +128,40 @@ public class Main extends Application {
 		initCloseButton(primaryStage);
 		
 		initMinimizeButton(primaryStage);
+		
+	}
+	
+	double xOffset, yOffset;
+	boolean pressed;
+	public void makeDraggable(Scene pane) {
+		
+		primaryStage.setX(600);
+		
+//		pane.setOnMousePressed(new EventHandler<MouseEvent>() {
+//            public void handle(MouseEvent event) {
+//            	pressed = true;
+//            	System.out.println("salam");
+//                xOffset = primaryStage.getX() - event.getScreenX();
+//                yOffset = primaryStage.getY() - event.getScreenY();
+//            }
+//        });
+		
+//		primaryStage.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+//		    @Override
+//		    public void handle(MouseEvent mouseEvent) {
+//		        System.out.println("mouse click detected! " + mouseEvent.getSource());
+//		    }
+//		});
+		
+//		pane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+//			@Override
+//            public void handle(MouseEvent event) {
+//                System.out.println("fuck");
+//				primaryStage.setX(event.getScreenX() + 10);
+//                primaryStage.setY(event.getScreenY() + 25);
+//            }
+//        });
+
 		
 	}
 	

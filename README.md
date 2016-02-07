@@ -14,7 +14,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Oracle Java 8.
 
 ## Supported Platforms
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RezRem has been tested under Windows 7 and Ubuntu 14.04, but should work on any platform where a Java 8 JRE or JDK is available.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RezRem has been tested under Windows 7 and Ubuntu 12.02, but should work on any platform where a Java 8 JRE or JDK is available.
 
 ## License
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RezRem is released under [LGPL license v3.0](http://www.gnu.org/licenses/lgpl-3.0.en.html).
