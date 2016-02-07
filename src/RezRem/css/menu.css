@@ -1,7 +1,11 @@
 #menu {
     overflow: hidden;
-    margin: 0;
     text-align: right;
+    margin-top: 30px;
+}
+
+body {
+    overflow: hidden;
 }
 
 #menu li.disabled .collapsible-body {
@@ -45,15 +49,16 @@
 }
 
 #name-container {
-    position: absolute;
+    top: 100px;
     left: 50%;
     transform: translate(-50%, 0);
-    top: 100px;
+    position: absolute;
 }
 
 #name {
     color: aqua;
     margin-right: 3px;
+    font-size: 17px;
 }
 
 #hello {
