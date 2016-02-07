@@ -43,3 +43,19 @@
     text-align: center;
     padding: 1.5rem 0 1rem 0;
 }
+
+#name-container {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    top: 100px;
+}
+
+#name {
+    color: aqua;
+    margin-right: 3px;
+}
+
+#hello {
+    opacity: 0.5;
+}
