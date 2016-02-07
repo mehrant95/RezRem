@@ -9,9 +9,9 @@ input {
     color: #fff;
 }
 
-.container {
-    text-align: center;
+.centered {
+	position: relative;
+	text-align: center;
     top: 50%;
-    position: relative;
     transform: translate(0, -50%);
 }

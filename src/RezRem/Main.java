@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
@@ -22,6 +23,8 @@ import javax.imageio.ImageIO;
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserFunction;
 import com.teamdev.jxbrowser.chromium.JSValue;
+import com.teamdev.jxbrowser.chromium.events.FinishLoadingEvent;
+import com.teamdev.jxbrowser.chromium.events.LoadAdapter;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -43,6 +46,10 @@ public class Main extends Application {
     
     private File config;
 	
+    private File main_template_file;
+    
+    private String main_template_str;
+    
     private Dining dining;
     
 	public static void main(String[] args) {
@@ -88,6 +95,10 @@ public class Main extends Application {
 		
 		config = new File("src/RezRem/user.config");
 		
+		main_template_file = new File("src/RezRem/templates/main.html");
+		
+		registerLogin();
+		
 		if(!config.exists()) {
 			
 			showLogin();
@@ -107,15 +118,19 @@ public class Main extends Application {
 				
 				br.close();
 				
-				dining.setUserName(u_str.split("=")[1]);
+				dining.setUserName(EncryptUtils.decode(u_str).split("=")[1]);
 				
-				dining.setPassword(p_str.split("=")[1]);
+				dining.setPassword(EncryptUtils.decode(p_str).split("=")[1]);
+				
+				browser.loadURL(Main.class.getResource("templates/loading.html").toExternalForm());
 				
 				doLogin();
 				
 			} catch (Exception e) {
 				
-				// handler
+				config.delete();
+				
+				showLogin();
 				
 			}
 			
@@ -340,12 +355,18 @@ public class Main extends Application {
 		
 		browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
 		
+	}
+	
+	public void registerLogin() {
+		
 		browser.registerFunction("Login", new BrowserFunction() {
 			
 			@Override
 			public JSValue invoke(JSValue... args) {				
 				
 				if (args.length >= 2) {
+					
+					browser.loadURL(Main.class.getResource("templates/loading.html").toExternalForm());
 					
 					JSValue[] arr = args.clone();
 					
@@ -357,7 +378,7 @@ public class Main extends Application {
 					
 				}
 				
-				return JSValue.create("Hello!");
+				return null;
 				
 			}
 			
@@ -413,11 +434,38 @@ public class Main extends Application {
 					
 						}
 						
+						loadMainTemplate();
+						
+						loadMenu();
+						
 					}
 					
 				} else {
 					
-					//handler
+					browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
+					
+					final LoadAdapter loadAdapter = new LoadAdapter() {
+						
+						@Override
+					    public void onFinishLoadingFrame(FinishLoadingEvent event) {
+							
+					        if (event.isMainFrame()) {
+					        	
+					        	if (config.exists())
+					        		config.delete();
+					        	
+					        	browser.removeLoadListener(this);
+					        	
+					        	if (dining.getUserName() != null && dining.getPassword() != null)
+					        		loginLoaded();
+					        
+					        }
+					        
+					    }
+						
+					};
+					
+					browser.addLoadListener(loadAdapter);
 					
 				}
 				
@@ -426,6 +474,50 @@ public class Main extends Application {
 		});
 		
 		new Thread(task).start();
+		
+	}
+	
+	public void loginLoaded() {
+		
+		browser.executeJavaScript("$(\"label[for='student_number']\").addClass('active');");
+		
+		browser.executeJavaScript("$('#student_number').attr('value', '" + dining.getUserName() + "');");
+		
+		browser.executeJavaScript("$(\"label[for='password']\").addClass('active');");
+		
+		browser.executeJavaScript("$('#password').attr('value', '" + dining.getPassword() + "');");
+	
+	}
+	
+	public void loadMainTemplate() {
+		
+		if (main_template_file.exists() && !main_template_file.isDirectory()) {
+			
+			try {
+				
+				Scanner scanner = new Scanner(main_template_file);
+				
+				main_template_str = scanner.useDelimiter("\\Z").next();
+				
+				scanner.close();
+				
+				System.out.println(main_template_str);
+				
+			} catch (FileNotFoundException e) {
+				
+				e.printStackTrace();
+				
+			}
+			
+		}
+		
+		
+		
+	}
+	
+	public void loadMenu() {
+		
+		browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
 		
 	}
 	

@@ -18,7 +18,19 @@ public class Dining {
 	
 	private String login_url = "http://reserve.dining.sharif.ir/login";
 	
+	private String foods_url = "http://reserve.dining.sharif.ir/";
+	
 	private String symfony_cookie;
+	
+	private int delivery_id;
+	
+	private int previous_t_id, current_t_id, next_t_id;
+	
+	public Dining() {
+		
+		delivery_id = 2;
+		
+	}
 	
 	public String getUserName() {
 		
@@ -87,6 +99,29 @@ public class Dining {
 		}
 		
 		return false;
+		
+	}
+	
+	public void getMenu() {
+		
+		if (current_t_id == 0) {
+			
+			HttpRequestResult res = SendRequest.sendGet(foods_url, symfony_cookie);
+			
+			HttpResponse response = res.getResponse();
+			
+			System.out.println(res.getResult());
+			
+		}
+		else {
+			
+			
+			
+		}
+		
+		String a = "http://reserve.dining.sharif.ir/?t=1454769759&delivery_id=5";
+		
+		
 		
 	}
 
