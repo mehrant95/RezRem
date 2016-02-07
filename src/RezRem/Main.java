@@ -370,9 +370,12 @@ public class Main extends Application {
 				
 				if (args.length >= 2) {
 					
-					browser.loadURL(Main.class.getResource("templates/loading.html").toExternalForm());
-					
 					JSValue[] arr = args.clone();
+					
+					if (arr[0].getString().trim().isEmpty() || arr[1].getString().trim().isEmpty())
+						return null;
+					
+					browser.loadURL(Main.class.getResource("templates/loading.html").toExternalForm());
 					
 					dining.setUserName(arr[0].getString());
 					
@@ -483,14 +486,22 @@ public class Main extends Application {
 	
 	public void loginLoaded() {
 		
-		browser.executeJavaScript("$(\"label[for='student_number']\").addClass('active');");
+		if (!dining.getUserName().trim().isEmpty()) {
+			
+			browser.executeJavaScript("$(\"label[for='student_number']\").addClass('active');");
+			
+			browser.executeJavaScript("$('#student_number').attr('value', '" + dining.getUserName() + "');");
+			
+		}
 		
-		browser.executeJavaScript("$('#student_number').attr('value', '" + dining.getUserName() + "');");
+		if (!dining.getPassword().trim().isEmpty()) {
 		
-		browser.executeJavaScript("$(\"label[for='password']\").addClass('active');");
+			browser.executeJavaScript("$(\"label[for='password']\").addClass('active');");
 		
-		browser.executeJavaScript("$('#password').attr('value', '" + dining.getPassword() + "');");
+			browser.executeJavaScript("$('#password').attr('value', '" + dining.getPassword() + "');");
 	
+		}
+		
 	}
 	
 	public void registerFunctions() {
