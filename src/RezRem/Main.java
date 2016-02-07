@@ -20,6 +20,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserFunction;
 import com.teamdev.jxbrowser.chromium.JSValue;
@@ -438,8 +442,6 @@ public class Main extends Application {
 					
 					loadMainTemplate();
 					
-					loadMenu();
-					
 				} else {
 					
 					browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
@@ -513,11 +515,45 @@ public class Main extends Application {
 			
 		}
 		
-	}
-	
-	public void loadMenu() {
-		
-		browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
+		if (main_template_str != null) {
+			
+			String name = dining.getName();
+			
+			if (name != null) {
+				
+				Document doc = Jsoup.parse(main_template_str);
+				
+				Elements elements = doc.select("#name");
+				
+				if (!elements.isEmpty()) {
+					
+					elements.get(0).html(name);
+					
+					main_template_file.delete();
+					
+					try {
+						
+						main_template_file.createNewFile();
+						
+						FileWriter writer = new FileWriter(main_template_file);
+						
+						writer.write(doc.toString());
+						
+						writer.close();
+						
+						browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
+						
+					} catch (Exception e) {
+						
+						//handler
+						
+					}
+					
+				}
+				
+			}
+			
+		}
 		
 	}
 	

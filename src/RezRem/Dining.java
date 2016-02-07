@@ -8,6 +8,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Dining {
@@ -58,12 +59,14 @@ public class Dining {
 	
 	public boolean logIn() {
 		
+		setInitialCookie();
+		
 		List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
 		
 		urlParameters.add(new BasicNameValuePair("signin[username]", userName));
 		urlParameters.add(new BasicNameValuePair("signin[password]", password));
 		
-		HttpRequestResult res = SendRequest.sendPost(login_url, null, urlParameters);
+		HttpRequestResult res = SendRequest.sendPost(login_url, symfony_cookie, urlParameters);
 		
 		HttpResponse response = res.getResponse();
 		
@@ -102,6 +105,26 @@ public class Dining {
 		
 	}
 	
+	public void setInitialCookie() {
+		
+		try {
+		
+			HttpRequestResult res = SendRequest.sendGet(foods_url, "");
+			
+			HttpResponse response = res.getResponse();
+			
+			symfony_cookie = response.getHeaders("Set-Cookie")[0]
+					.toString().split(" ")[1].split(";")[0];
+			
+			
+		} catch (Exception e) {
+			
+			//handler
+			
+		}
+		
+	}
+	
 	public void getMenu() {
 		
 		if (current_t_id == 0) {
@@ -122,6 +145,31 @@ public class Dining {
 		String a = "http://reserve.dining.sharif.ir/?t=1454769759&delivery_id=5";
 		
 		
+		
+	}
+	
+	public String getName() {
+		
+		String result = null;
+		
+		HttpRequestResult res = SendRequest.sendGet(foods_url, symfony_cookie);
+		
+		Document doc = Jsoup.parse(res.getResult());
+		
+		Elements elements = doc.select("tbody tr:nth-child(2) td:nth-child(3) blockquote h1:nth-of-type(2)");
+		
+		if (!elements.isEmpty()) {
+			
+			Element element = elements.get(0);
+			
+			String[] wel_mes = element.ownText().split(" ");
+			
+			if (wel_mes.length > 1)
+				result = wel_mes[1];
+			
+		}
+		
+		return result;
 		
 	}
 

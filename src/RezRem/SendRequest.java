@@ -26,8 +26,8 @@ public class SendRequest {
 			
 			HttpGet request = new HttpGet(url);
 
-			request.addHeader("User-Agent", USER_AGENT);
-			request.addHeader("Cookie", cookie);
+			request.setHeader("User-Agent", USER_AGENT);
+			request.setHeader("Cookie", cookie);
 			
 			response = httpClient.execute(request);
 
@@ -66,7 +66,7 @@ public class SendRequest {
 			HttpPost post = new HttpPost(url);
 
 			post.setHeader("User-Agent", USER_AGENT);
-			post.addHeader("Cookie", cookie);
+			post.setHeader("Cookie", cookie);
 			
 			post.setEntity(new UrlEncodedFormEntity(urlParameters));
 
