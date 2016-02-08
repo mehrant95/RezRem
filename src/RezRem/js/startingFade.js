@@ -1,3 +1,3 @@
 (function($){
-    $('body > *').fadeIn(1000, function () {});
+    $('body > div').fadeIn(1000, function () {});
 })(jQuery);

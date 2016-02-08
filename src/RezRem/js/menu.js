@@ -1,8 +1,15 @@
 (function($){
+
+    var elements = $('body > div');
+
     $('#exit').on('click', function () {
-        $('body > .centered').fadeOut(function () {
+        $.when(elements.fadeOut()).done(function () {
             Exit();
         });
-        $('#name-container').fadeOut(function() {});
+    });
+    $("#reserves").on('click', function () {
+        $.when(elements.fadeOut()).done(function () {
+            GetReserves();
+        });
     });
 })(jQuery);

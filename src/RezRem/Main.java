@@ -500,6 +500,25 @@ public class Main extends Application {
 		
 		registerGetFirstName();
 		
+		registerReturn();
+		
+	}
+	
+	public void registerReturn() {
+		
+		browser.registerFunction("Return", new BrowserFunction() {
+			
+			@Override
+			public JSValue invoke(JSValue... args) {				
+				
+				browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
+				
+				return null;
+				
+			}
+			
+		});
+		
 	}
 	
 	public void registerExit() {

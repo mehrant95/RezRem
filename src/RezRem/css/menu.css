@@ -1,7 +1,5 @@
 #menu {
-    overflow: hidden;
     text-align: right;
-    margin-top: 30px;
 }
 
 body {
@@ -26,16 +24,6 @@ body {
 
 .collapsible.popout > li {
     box-shadow: none;
-}
-
-.collapsible-body .btn-flat {
-    width: 100%;
-    text-align: center;
-    color: rgba(255, 255, 255, 0.32);
-}
-
-.collapsible-body .btn-flat:hover {
-    color: white;
 }
 
 .collapsible-body {

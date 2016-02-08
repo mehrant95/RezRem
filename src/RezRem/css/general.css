@@ -9,13 +9,23 @@ input {
     color: #fff;
 }
 
-body > *:not(header) {
+body > div {
     display: none;
 }
 
 .centered {
-	position: relative;
-	text-align: center;
+    position: relative;
+    text-align: center;
     top: 50%;
     transform: translate(0, -50%);
+}
+
+.btn-flat {
+    width: 100%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.32);
+}
+
+.btn-flat:hover {
+    color: white;
 }
