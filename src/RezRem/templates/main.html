@@ -19,7 +19,7 @@
   </header> 
   <div id="name-container"> 
    <span id="hello">سلام </span> 
-   <span id="name">مهران</span> 
+   <span id="name"><script>document.write(GetFirstName());</script></span>
   </div> 
   <div class="centered"> 
    <ul id="menu" class="collapsible popout" data-collapsible="accordion"> 
@@ -28,7 +28,7 @@
       <i class="material-icons">filter_drama</i>تنظیمات 
      </div> 
      <div class="collapsible-body"> 
-      <p>در این قسمت می توانید تنظیمات مختلف مانند </p> 
+      <p>تنظیمات مختلف مانند زمان هشدار، زمان رزرو اتوماتیک</p> 
       <a class="waves-effect waves-teal btn-flat" id="settings">ورود به بخش تنظیمات</a> 
      </div> </li> 
     <li> 
@@ -36,7 +36,7 @@
       <i class="material-icons">trending_up</i>اولویت ها 
      </div> 
      <div class="collapsible-body"> 
-      <p>Lorem ipsum dolor sit amet.</p> 
+      <p>اعمال اولویت به غذاها برای رزرو اتوماتیک</p> 
       <a class="waves-effect waves-teal btn-flat" id="priorities">ورود به بخش اولویت ها</a> 
      </div> </li> 
     <li> 
@@ -44,7 +44,7 @@
       <i class="material-icons">today</i>رزروها 
      </div> 
      <div class="collapsible-body"> 
-      <p>Lorem ipsum dolor sit amet.</p> 
+      <p>لیست غذاهای رزرو شده در هفته های مختلف</p> 
       <a class="waves-effect waves-teal btn-flat" id="reserves">ورود به بخش رزروها</a> 
      </div> </li> 
     <li> 
@@ -52,9 +52,9 @@
       <i class="material-icons">schedule</i>روزفروش 
      </div> 
      <div class="collapsible-body"> 
-      <p>Lorem ipsum dolor sit amet.</p> 
+      <p>روزفروش به صورت اتوماتیک</p> 
       <a class="waves-effect waves-teal btn-flat" id="daily-buy">ورود به بخش روزفروش</a> 
-     </div> </li> 
+     </div></li>
     <li class="disabled" id="exit"> 
      <div class="collapsible-header"> 
       <i class="material-icons">power_settings_new</i>خروج 
@@ -64,6 +64,7 @@
   <script type="text/javascript" src="../js/jquery-2.2.0.min.js"></script> 
   <script type="text/javascript" src="../js/materialize.min.js"></script> 
   <script type="text/javascript" src="../js/header.js"></script> 
+  <script type="text/javascript" src="../js/startingFade.js"></script> 
   <script type="text/javascript" src="../js/menu.js"></script>  
  </body>
 </html>

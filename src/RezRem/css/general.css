@@ -9,6 +9,10 @@ input {
     color: #fff;
 }
 
+body > *:not(header) {
+    display: none;
+}
+
 .centered {
 	position: relative;
 	text-align: center;

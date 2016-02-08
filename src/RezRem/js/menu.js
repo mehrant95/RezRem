@@ -1,6 +1,8 @@
 (function($){
     $('#exit').on('click', function () {
-        console.log("sslss")
-        Exit();
+        $('body > .centered').fadeOut(function () {
+            Exit();
+        });
+        $('#name-container').fadeOut(function() {});
     });
 })(jQuery);

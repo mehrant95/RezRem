@@ -15,14 +15,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.BrowserFunction;
@@ -50,11 +45,9 @@ public class Main extends Application {
     
     private File config;
 	
-    private File main_template_file;
-    
-    private String main_template_str;
-    
     private Dining dining;
+    
+    private String firstName;
     
 	public static void main(String[] args) {
 		
@@ -98,8 +91,6 @@ public class Main extends Application {
 		// read user name & password file
 		
 		config = new File("src/RezRem/user.config");
-		
-		main_template_file = new File("src/RezRem/templates/main.html");
 		
 		registerLogin();
 		
@@ -415,32 +406,31 @@ public class Main extends Application {
 				
 				if (success) {
 				
-					if (!config.exists()) {
-						
-						try {
-							
-							config.createNewFile();
-							
-							FileWriter writer = new FileWriter(config);
-							
-							writer.write(EncryptUtils.encode("username=" + dining.getUserName()) + "\n");
-							
-							writer.write(EncryptUtils.encode("password=" + dining.getPassword()) + "\n");
-							
-							writer.flush();
-						
-							writer.close();
-							
-						} catch (FileNotFoundException e) {
-							
-							e.printStackTrace();
+					if (config.exists())
+						config.delete();
 					
-						} catch (IOException e) {
+					try {
 						
-							e.printStackTrace();
+						config.createNewFile();
+						
+						FileWriter writer = new FileWriter(config);
+						
+						writer.write(EncryptUtils.encode("username=" + dining.getUserName()) + "\n");
+						
+						writer.write(EncryptUtils.encode("password=" + dining.getPassword()) + "\n");
+						
+						writer.flush();
 					
-						}
+						writer.close();
 						
+					} catch (FileNotFoundException e) {
+						
+						e.printStackTrace();
+				
+					} catch (IOException e) {
+					
+						e.printStackTrace();
+				
 					}
 					
 					loadMainTemplate();
@@ -508,6 +498,8 @@ public class Main extends Application {
 		
 		registerExit();
 		
+		registerGetFirstName();
+		
 	}
 	
 	public void registerExit() {
@@ -517,10 +509,29 @@ public class Main extends Application {
 			@Override
 			public JSValue invoke(JSValue... args) {				
 				
-				main_template_str = null;
-					
+				firstName = null;
+				
 				browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
+				
+				final LoadAdapter loadAdapter = new LoadAdapter() {
 					
+					@Override
+				    public void onFinishLoadingFrame(FinishLoadingEvent event) {
+						
+				        if (event.isMainFrame()) {
+				        	
+				        	browser.removeLoadListener(this);
+				        	
+				        	loginLoaded();
+				        
+				        }
+				        
+				    }
+					
+				};
+				
+				browser.addLoadListener(loadAdapter);
+				
 				return null;
 				
 			}
@@ -531,67 +542,31 @@ public class Main extends Application {
 	
 	public void loadMainTemplate() {
 		
-		if (main_template_str == null) {
+		if (firstName == null) {
 			
-			if (main_template_file.exists() && !main_template_file.isDirectory()) {
-			
-				try {
-					
-					Scanner scanner = new Scanner(main_template_file);
-					
-					main_template_str = scanner.useDelimiter("\\Z").next();
-					
-					scanner.close();
-					
-				} catch (FileNotFoundException e) {
-					
-					e.printStackTrace();
-					
-				}
-			
-			}
+			firstName = dining.getName();
 			
 		}
 		
-		if (main_template_str != null) {
+		browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
+		
+	}
+	
+	public void registerGetFirstName() {
+		
+		browser.registerFunction("GetFirstName", new BrowserFunction() {
 			
-			String name = dining.getName();
-			
-			if (name != null) {
+			@Override
+			public JSValue invoke(JSValue... args) {				
 				
-				Document doc = Jsoup.parse(main_template_str);
-				
-				Elements elements = doc.select("#name");
-				
-				if (!elements.isEmpty()) {
-					
-					elements.get(0).html(name);
-					
-					main_template_file.delete();
-					
-					try {
-						
-						main_template_file.createNewFile();
-						
-						FileWriter writer = new FileWriter(main_template_file);
-						
-						writer.write(doc.toString());
-						
-						writer.close();
-						
-						browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
-						
-					} catch (Exception e) {
-						
-						//handler
-						
-					}
-					
-				}
+				if (firstName == null)
+					return JSValue.create("");
+				else
+					return JSValue.create(firstName);
 				
 			}
 			
-		}
+		});
 		
 	}
 	
