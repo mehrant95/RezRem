@@ -8,4 +8,6 @@
         });
     });
 
+    $('#select-reserve-days').material_select();
+
 })(jQuery);

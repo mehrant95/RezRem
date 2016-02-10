@@ -36,19 +36,9 @@ body {
     padding: 1.5rem 0 1rem 0;
 }
 
-#name-container {
-    top: 100px;
-    left: 50%;
-    transform: translate(-50%, 0);
-    position: absolute;
-}
-
-#name {
-    color: aqua;
-    margin-right: 3px;
-    font-size: 17px;
-}
-
-#hello {
-    opacity: 0.5;
+#return {
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
 }

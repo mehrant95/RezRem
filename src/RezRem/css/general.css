@@ -1,7 +1,12 @@
+html {
+    direction: rtl;
+}
+
 body {
     font-family: 'yekan';
     height: 100vh;
     background-color: rgba(34, 67, 74, 0.9);
+    overflow: hidden;
 }
 
 input {
@@ -20,6 +25,10 @@ body > div {
     transform: translate(0, -50%);
 }
 
+.centered:not(.no-margin) {
+    margin-top: 20px;
+}
+
 .btn-flat {
     width: 100%;
     text-align: center;
@@ -28,4 +37,25 @@ body > div {
 
 .btn-flat:hover {
     color: white;
+}
+
+.preloader-wrapper {
+    direction: ltr;
+}
+
+#name-container {
+    top: 50px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    position: fixed;
+}
+
+#name {
+    color: aqua;
+    margin-right: 3px;
+    font-size: 17px;
+}
+
+#hello {
+    opacity: 0.5;
 }

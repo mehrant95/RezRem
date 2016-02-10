@@ -6,6 +6,22 @@
     <link type="text/css" rel="stylesheet" href="../css/font.css"/>
     <link type="text/css" rel="stylesheet" href="../css/general.css"/>
     <link type="text/css" rel="stylesheet" href="../css/header.css"/>
+    <style>
+        @keyframes wink {
+            0% {opacity: 1;}
+            50% {opacity: 0;}
+            100% {opacity: 1;}
+        }
+        #load-message {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%, 100%);
+            animation-name: wink;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+        }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
@@ -16,7 +32,7 @@
     <img src="../img/minimize.png" id="minimize-btn" alt="minimize button"/>
     <img src="../img/minimize-hover.png" id="minimize-btn-hover" alt="minimize button hover"/>
 </header>
-<div class="container centered">
+<div class="container centered no-margin">
     <div class="preloader-wrapper big active">
         <div class="spinner-layer spinner-blue">
             <div class="circle-clipper left">
@@ -58,6 +74,7 @@
         </div>
         </div>
     </div>
+    <label id="load-message"><script>document.write(GetLoadMessage())</script></label>
 </div>
 <script type="text/javascript" src="../js/jquery-2.2.0.min.js"></script>
 <script type="text/javascript" src="../js/materialize.min.js"></script>

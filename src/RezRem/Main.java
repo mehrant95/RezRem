@@ -15,6 +15,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
@@ -44,10 +50,18 @@ public class Main extends Application {
     private TrayIcon trayIcon;
     
     private File config;
+    
+    private File settings;
 	
     private Dining dining;
     
     private String firstName;
+    
+    private Date lastReserve;
+    
+    private boolean reservedNextWeek;
+    
+    private String loadingMessage;
     
 	public static void main(String[] args) {
 		
@@ -74,9 +88,7 @@ public class Main extends Application {
 		
 		pane.getChildren().add(browserView);
 		
-		Scene scene = new Scene(pane, 380, 500);
-		
-		makeDraggable(scene);
+		Scene scene = new Scene(pane, 330, 470);
 		
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		
@@ -88,11 +100,38 @@ public class Main extends Application {
 		
 		dining = new Dining();
 		
+		settings = new File("src/RezRem/settings");
+		
+		if (settings.exists() && !settings.isDirectory()) {
+			
+			try {
+				
+				BufferedReader br = new BufferedReader(new FileReader(settings));
+				
+				SimpleDateFormat format = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+				
+				lastReserve = format.parse(br.readLine());
+				
+				changeReserveBool(!(getDayDiff(new Date(), getExpDate()) > 0));
+				
+				br.close();
+				
+			} catch (Exception e) {
+				
+				// handler
+				
+				
+			}
+			
+		}
+		
 		// read user name & password file
 		
 		config = new File("src/RezRem/user.config");
 		
 		registerLogin();
+		
+		registerLoadMessage();
 		
 		if(!config.exists()) {
 			
@@ -117,6 +156,8 @@ public class Main extends Application {
 				
 				dining.setPassword(EncryptUtils.decode(p_str).split("=")[1]);
 				
+				loadingMessage = "در حال ورود به سامانه ...";
+				
 				browser.loadURL(Main.class.getResource("templates/loading.html").toExternalForm());
 				
 				doLogin();
@@ -138,40 +179,6 @@ public class Main extends Application {
 		initCloseButton(primaryStage);
 		
 		initMinimizeButton(primaryStage);
-		
-	}
-	
-	double xOffset, yOffset;
-	boolean pressed;
-	public void makeDraggable(Scene pane) {
-		
-		primaryStage.setX(600);
-		
-//		pane.setOnMousePressed(new EventHandler<MouseEvent>() {
-//            public void handle(MouseEvent event) {
-//            	pressed = true;
-//            	System.out.println("salam");
-//                xOffset = primaryStage.getX() - event.getScreenX();
-//                yOffset = primaryStage.getY() - event.getScreenY();
-//            }
-//        });
-		
-//		primaryStage.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
-//		    @Override
-//		    public void handle(MouseEvent mouseEvent) {
-//		        System.out.println("mouse click detected! " + mouseEvent.getSource());
-//		    }
-//		});
-		
-//		pane.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//			@Override
-//            public void handle(MouseEvent event) {
-//                System.out.println("fuck");
-//				primaryStage.setX(event.getScreenX() + 10);
-//                primaryStage.setY(event.getScreenY() + 25);
-//            }
-//        });
-
 		
 	}
 	
@@ -225,7 +232,6 @@ public class Main extends Application {
 		
 	}
 
-	
 	public void createTrayIcon() {
         
 		if (SystemTray.isSupported()) {
@@ -352,6 +358,21 @@ public class Main extends Application {
 		
 	}
 	
+	public void registerLoadMessage() {
+		
+		browser.registerFunction("GetLoadMessage", new BrowserFunction() {
+			
+			@Override
+			public JSValue invoke(JSValue... args) {				
+				
+				return JSValue.create(loadingMessage);
+				
+			}
+			
+		});
+		
+	}
+	
 	public void registerLogin() {
 		
 		browser.registerFunction("Login", new BrowserFunction() {
@@ -365,6 +386,8 @@ public class Main extends Application {
 					
 					if (arr[0].getString().trim().isEmpty() || arr[1].getString().trim().isEmpty())
 						return null;
+					
+					loadingMessage = "در حال ورود به سامانه ...";
 					
 					browser.loadURL(Main.class.getResource("templates/loading.html").toExternalForm());
 					
@@ -433,9 +456,11 @@ public class Main extends Application {
 				
 					}
 					
-					loadMainTemplate();
-					
 					registerFunctions();
+					
+					goForReserve();
+					
+					loadSimpleTemplate();
 					
 				} else {
 					
@@ -502,6 +527,48 @@ public class Main extends Application {
 		
 		registerReturn();
 		
+		registerGoToMain();
+		
+		registerGetReserveBool();
+		
+		registerNowReserve();
+		
+		registerReserveDone();
+		
+	}
+	
+	public void registerReserveDone() {
+		
+		browser.registerFunction("ReserveDone", new BrowserFunction() {
+			
+			@Override
+			public JSValue invoke(JSValue... args) {
+				
+				changeReserveBool(true);
+				
+				return null;
+				
+			}
+			
+		});
+		
+	}
+	
+	public void registerNowReserve() {
+		
+		browser.registerFunction("NowReserve", new BrowserFunction() {
+			
+			@Override
+			public JSValue invoke(JSValue... args) {				
+				
+				reserve();
+				
+				return null;
+				
+			}
+			
+		});
+		
 	}
 	
 	public void registerReturn() {
@@ -511,7 +578,7 @@ public class Main extends Application {
 			@Override
 			public JSValue invoke(JSValue... args) {				
 				
-				browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
+				browser.loadURL(Main.class.getResource("templates/simple.html").toExternalForm());
 				
 				return null;
 				
@@ -559,7 +626,30 @@ public class Main extends Application {
 		
 	}
 	
-	public void loadMainTemplate() {
+	public void registerGoToMain() {
+		
+		browser.registerFunction("GoToMain", new BrowserFunction() {
+			
+			@Override
+			public JSValue invoke(JSValue... args) {				
+				
+				if (firstName == null) {
+					
+					firstName = dining.getName();
+					
+				}
+				
+				browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
+				
+				return null;
+				
+			}
+			
+		});
+		
+	}
+	
+	public void loadSimpleTemplate() {
 		
 		if (firstName == null) {
 			
@@ -567,7 +657,7 @@ public class Main extends Application {
 			
 		}
 		
-		browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
+		browser.loadURL(Main.class.getResource("templates/simple.html").toExternalForm());
 		
 	}
 	
@@ -586,6 +676,214 @@ public class Main extends Application {
 			}
 			
 		});
+		
+	}
+	
+	public Date getExpDate() {
+		
+		Calendar c = Calendar.getInstance();
+		
+		c.setTime(lastReserve);
+		
+		int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+		
+		dayOfWeek %= 7;
+		
+		c.add(Calendar.DATE, 6 - dayOfWeek);
+		
+		return c.getTime();
+		
+	}
+	
+	public void registerGetReserveBool() {
+		
+		browser.registerFunction("reservedNextWeek", new BrowserFunction() {
+			
+			@Override
+			public JSValue invoke(JSValue... args) {				
+				
+				return JSValue.create(reservedNextWeek);
+				
+			}
+			
+		});
+		
+	}
+	
+	public long getDayDiff(Date dt1, Date dt2) {
+		
+		long diffInMillies = dt1.getTime() - dt2.getTime();
+		
+		return TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+		
+	}
+	
+	public void changeReserveBool(boolean newValue) {
+		
+		if (newValue != reservedNextWeek) {
+		
+			if (newValue) {
+				
+				browser.executeJavaScript("$('#now-reserve a').addClass('disabled').removeClass('waves-effect')");
+				
+				browser.executeJavaScript("$('#reserve-done a').addClass('disabled').removeClass('waves-effect')");
+				
+				if (lastReserve == null) {
+					
+					lastReserve = new Date();
+					
+					writeLastDate();
+					
+				}
+					
+				if (SystemTray.isSupported()) {
+					
+					trayIcon.displayMessage("RezRem",
+		                    "Reservation has been done for the next week!",
+		                    TrayIcon.MessageType.WARNING);
+					
+				}
+				
+			}
+			else {
+				
+				browser.executeJavaScript("$('#now-reserve a').removeClass('disabled').addClass('waves-effect')");
+				
+				browser.executeJavaScript("$('#reserve-done a').removeClass('disabled').addClass('waves-effect')");
+				
+			}
+		
+			reservedNextWeek = newValue;
+		
+		}
+		
+	}
+	
+	public void goForReserve() {
+		
+		// 4 for Wednesday
+		
+		Timer timer = new Timer ();
+		
+		TimerTask hourlyTask = new TimerTask() {
+			
+		    @Override
+		    public void run () {
+		        
+		    	check();
+		    	
+		    }
+		    
+		};
+
+		// schedule the task to run starting now and then every 5 hour...
+		
+		timer.schedule(hourlyTask, 0l, 1000*60*60*5);
+		
+	}
+	
+	public void writeLastDate() {
+		
+		if (settings.exists())
+			settings.delete();
+		
+		try {
+			
+			settings.createNewFile();
+			
+			FileWriter writer = new FileWriter(settings);
+			
+			writer.write(lastReserve.toString());
+			
+			writer.flush();
+		
+			writer.close();
+			
+		} catch (Exception e) {
+			
+			// handler
+			
+		}
+		
+	}
+	
+	public void check() {
+		
+		changeReserveBool(dining.nextWeekIsReserved(5));
+    	
+    	if (reservedNextWeek) {
+    		
+    		changeReserveBool(!(getDayDiff(new Date(), getExpDate()) > 0));
+    		
+    	}
+    	else {
+    		
+    		Calendar c = Calendar.getInstance();
+			
+			int todayDayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+			
+			if (todayDayOfWeek == 3 || todayDayOfWeek == 4 || todayDayOfWeek == 3) {
+				
+				reserve();
+				
+			}
+			else if (todayDayOfWeek == 2 || todayDayOfWeek == 1 || todayDayOfWeek == 7){
+				
+				if (SystemTray.isSupported()) {
+					
+					trayIcon.displayMessage("RezRem",
+		                    "Don't forget to reserve food for next week!",
+		                    TrayIcon.MessageType.WARNING);
+					
+				}
+				
+			}
+    		
+    	}
+		
+	}
+	
+	public void reserve() {
+		
+		if (SystemTray.isSupported()) {
+			
+			trayIcon.displayMessage("RezRem",
+                    "RezRem is going to reserve food for next week!",
+                    TrayIcon.MessageType.INFO);
+			
+		}
+		
+		String result = dining.reserveNextWeek().trim();
+		
+		changeReserveBool(result.isEmpty());
+		
+		if (!result.isEmpty()) {
+			
+			if (SystemTray.isSupported()) {
+				
+				trayIcon.displayMessage("RezRem",
+	                    result,
+	                    TrayIcon.MessageType.ERROR);
+				
+			}
+			
+		}
+		
+		if (reservedNextWeek) {
+			
+			lastReserve = new Date();
+			
+			if (SystemTray.isSupported()) {
+				
+				trayIcon.displayMessage("RezRem",
+	                    "Reservation is Done!",
+	                    TrayIcon.MessageType.INFO);
+				
+			}
+			
+			writeLastDate();
+			
+		}
 		
 	}
 	
