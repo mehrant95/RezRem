@@ -4,7 +4,7 @@
 
     $('#return').on('click', function () {
         $.when(elements.fadeOut()).done(function () {
-            Return();
+            window.Events.goToFirst();
         });
     });
 

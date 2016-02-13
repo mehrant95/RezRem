@@ -1,6 +1,6 @@
 (function($){
     $('#login').on('click', function () {
-        Login($('#student_number').val(), $('#password').val());
+        window.Events.login($('#student_number').val(), $('#password').val());
     });
     $('body').keydown(function (event) {
         if (event.which == 13)

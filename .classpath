@@ -3,15 +3,15 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
-	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-6.0.2.jar"/>
-	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-linux32-6.0.2.jar"/>
-	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-linux64-6.0.2.jar"/>
-	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-mac-6.0.2.jar"/>
-	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-win-6.0.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/M3hRaN/Desktop/licence.jar"/>
 	<classpathentry kind="lib" path="C:/Users/M3hRaN/Desktop/httpcomponents-client-4.5.1/lib/httpclient-4.5.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/M3hRaN/Desktop/httpcomponents-client-4.5.1/lib/httpcore-4.4.3.jar"/>
 	<classpathentry kind="lib" path="C:/Users/M3hRaN/Desktop/httpcomponents-client-4.5.1/lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="C:/Users/M3hRaN/Desktop/jsoup-1.7.2.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-6.1.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-linux32-6.1.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-linux64-6.1.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-mac-6.1.jar"/>
+	<classpathentry kind="lib" path="D:/jxbrowser/lib/jxbrowser-win-6.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

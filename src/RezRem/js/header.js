@@ -32,11 +32,11 @@
     });
 
     close_btn_hover.on('click', function () {
-        Close();
+        window.Events.close();
     });
 
     minimize_btn_hover.on('click', function () {
-        Minimize();
+        window.Events.minimize();
     });
 
 })(jQuery);

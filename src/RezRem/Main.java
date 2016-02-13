@@ -26,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.imageio.ImageIO;
 
 import com.teamdev.jxbrowser.chromium.Browser;
-import com.teamdev.jxbrowser.chromium.BrowserFunction;
 import com.teamdev.jxbrowser.chromium.JSValue;
 import com.teamdev.jxbrowser.chromium.events.FinishLoadingEvent;
 import com.teamdev.jxbrowser.chromium.events.LoadAdapter;
@@ -55,13 +54,9 @@ public class Main extends Application {
 	
     private Dining dining;
     
-    private String firstName;
-    
     private Date lastReserve;
     
-    private boolean reservedNextWeek;
-    
-    private String loadingMessage;
+    private Events events;
     
 	public static void main(String[] args) {
 		
@@ -96,9 +91,28 @@ public class Main extends Application {
 		
 		primaryStage.show();
 		
-		initialize();
-		
 		dining = new Dining();
+		
+		events = new Events(browser, trayIcon, dining, this, primaryStage);
+		
+		browser.addLoadListener(new LoadAdapter() {
+		    
+			@Override
+		    public void onFinishLoadingFrame(FinishLoadingEvent event) {
+		        
+				if (event.isMainFrame()) {
+		            
+					Browser browser = event.getBrowser();
+		            
+					JSValue value = browser.executeJavaScriptAndReturnValue("window");
+		            
+					value.asObject().setProperty("Events", events);
+					
+		        }
+				
+		    }
+			
+		});
 		
 		settings = new File("src/RezRem/settings");
 		
@@ -129,13 +143,9 @@ public class Main extends Application {
 		
 		config = new File("src/RezRem/user.config");
 		
-		registerLogin();
-		
-		registerLoadMessage();
-		
 		if(!config.exists()) {
 			
-			showLogin();
+			browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
 		    
 		}
 		else if (!config.isDirectory()) {
@@ -151,12 +161,14 @@ public class Main extends Application {
 				String p_str = br.readLine();
 				
 				br.close();
-				
+			
 				dining.setUserName(EncryptUtils.decode(u_str).split("=")[1]);
 				
 				dining.setPassword(EncryptUtils.decode(p_str).split("=")[1]);
 				
-				loadingMessage = "در حال ورود به سامانه ...";
+				events.setLoadingMessage("در حال ورود به سامانه ...");
+				
+				setLoadMessageOnPage();
 				
 				browser.loadURL(Main.class.getResource("templates/loading.html").toExternalForm());
 				
@@ -166,69 +178,11 @@ public class Main extends Application {
 				
 				config.delete();
 				
-				showLogin();
+				browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
 				
 			}
 			
 		}
-		
-	}
-	
-	public void initialize() {
-		
-		initCloseButton(primaryStage);
-		
-		initMinimizeButton(primaryStage);
-		
-	}
-	
-	public void initCloseButton(Stage primaryStage) {
-		
-		browser.registerFunction("Close", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {
-				
-				Platform.runLater(new Runnable() {
-					
-					@Override
-					public void run() {
-						
-						closeToTray(primaryStage);
-						
-					}
-				});
-				
-				return null;
-				
-			}
-			
-		});
-		
-	}
-	
-	public void initMinimizeButton(Stage primaryStage) {
-		
-		browser.registerFunction("Minimize", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {
-				
-				Platform.runLater(new Runnable() {
-					
-					@Override
-					public void run() {
-						
-						primaryStage.setIconified(true);
-						
-					}
-				});
-				
-				return null;
-				
-			}
-			
-		});
 		
 	}
 
@@ -306,7 +260,9 @@ public class Main extends Application {
 	            
 				
 			} catch (IOException e1) {
+				
 				e1.printStackTrace();
+			
 			}
             
         }
@@ -326,86 +282,6 @@ public class Main extends Application {
     	}
     	
     }
-
-    private void closeToTray(Stage primaryStage) {
-    	
-        Platform.runLater(new Runnable() {
-            
-        	@Override
-            
-        	public void run() {
-                
-        		if (SystemTray.isSupported()) {
-                    
-        			primaryStage.hide();
-        			
-                    showMinimizeMessage();
-                    
-                } 
-        		else {
-        			
-                    System.exit(0);
-                
-        		}
-        		
-            }
-        });
-    }
-	
-	public void showLogin() {
-		
-		browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
-		
-	}
-	
-	public void registerLoadMessage() {
-		
-		browser.registerFunction("GetLoadMessage", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {				
-				
-				return JSValue.create(loadingMessage);
-				
-			}
-			
-		});
-		
-	}
-	
-	public void registerLogin() {
-		
-		browser.registerFunction("Login", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {				
-				
-				if (args.length >= 2) {
-					
-					JSValue[] arr = args.clone();
-					
-					if (arr[0].getString().trim().isEmpty() || arr[1].getString().trim().isEmpty())
-						return null;
-					
-					loadingMessage = "در حال ورود به سامانه ...";
-					
-					browser.loadURL(Main.class.getResource("templates/loading.html").toExternalForm());
-					
-					dining.setUserName(arr[0].getString());
-					
-					dining.setPassword(arr[1].getString());
-					
-					doLogin();
-					
-				}
-				
-				return null;
-				
-			}
-			
-		});
-		
-	}
 	
 	public void doLogin() {
 		
@@ -455,8 +331,6 @@ public class Main extends Application {
 						e.printStackTrace();
 				
 					}
-					
-					registerFunctions();
 					
 					goForReserve();
 					
@@ -519,34 +393,16 @@ public class Main extends Application {
 		
 	}
 	
-	public void registerFunctions() {
+	public void setNameOnPage() {
 		
-		registerExit();
-		
-		registerGetFirstName();
-		
-		registerReturn();
-		
-		registerGoToMain();
-		
-		registerGetReserveBool();
-		
-		registerNowReserve();
-		
-		registerReserveDone();
-		
-	}
-	
-	public void registerReserveDone() {
-		
-		browser.registerFunction("ReserveDone", new BrowserFunction() {
+		browser.addLoadListener(new LoadAdapter() {
 			
 			@Override
-			public JSValue invoke(JSValue... args) {
+		    public void onFinishLoadingFrame(FinishLoadingEvent event) {
 				
-				changeReserveBool(true);
+				browser.executeJavaScript("$('#name').text('" + events.getFirstName() + "');");
 				
-				return null;
+				browser.removeLoadListener(this);
 				
 			}
 			
@@ -554,94 +410,46 @@ public class Main extends Application {
 		
 	}
 	
-	public void registerNowReserve() {
+	public void setReserveBoolOnPage() {
 		
-		browser.registerFunction("NowReserve", new BrowserFunction() {
+		browser.addLoadListener(new LoadAdapter() {
 			
 			@Override
-			public JSValue invoke(JSValue... args) {				
+		    public void onFinishLoadingFrame(FinishLoadingEvent event) {
 				
-				reserve();
-				
-				return null;
-				
-			}
-			
-		});
-		
-	}
-	
-	public void registerReturn() {
-		
-		browser.registerFunction("Return", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {				
-				
-				browser.loadURL(Main.class.getResource("templates/simple.html").toExternalForm());
-				
-				return null;
-				
-			}
-			
-		});
-		
-	}
-	
-	public void registerExit() {
-		
-		browser.registerFunction("Exit", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {				
-				
-				firstName = null;
-				
-				browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
-				
-				final LoadAdapter loadAdapter = new LoadAdapter() {
+				if (events.getReservedNextWeek()) {
 					
-					@Override
-				    public void onFinishLoadingFrame(FinishLoadingEvent event) {
-						
-				        if (event.isMainFrame()) {
-				        	
-				        	browser.removeLoadListener(this);
-				        	
-				        	loginLoaded();
-				        
-				        }
-				        
-				    }
+					browser.executeJavaScript("$('#now-reserve a').addClass('disabled').removeClass('waves-effect')");
 					
-				};
-				
-				browser.addLoadListener(loadAdapter);
-				
-				return null;
-				
-			}
-			
-		});
-		
-	}
-	
-	public void registerGoToMain() {
-		
-		browser.registerFunction("GoToMain", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {				
-				
-				if (firstName == null) {
+					browser.executeJavaScript("$('#reserve-done a').addClass('disabled').removeClass('waves-effect')");
 					
-					firstName = dining.getName();
+				}
+				else {
+					
+					browser.executeJavaScript("$('#now-reserve a').removeClass('disabled').addClass('waves-effect')");
+					
+					browser.executeJavaScript("$('#reserve-done a').removeClass('disabled').addClass('waves-effect')");
 					
 				}
 				
-				browser.loadURL(Main.class.getResource("templates/main.html").toExternalForm());
+				browser.removeLoadListener(this);
 				
-				return null;
+			}
+			
+		});
+		
+	}
+	
+	public void setLoadMessageOnPage() {
+		
+		browser.addLoadListener(new LoadAdapter() {
+			
+			@Override
+		    public void onFinishLoadingFrame(FinishLoadingEvent event) {
+				
+				browser.executeJavaScript("$('#load-message').text('" + events.getLoadMessage() + "')");
+				
+				browser.removeLoadListener(this);
 				
 			}
 			
@@ -651,31 +459,17 @@ public class Main extends Application {
 	
 	public void loadSimpleTemplate() {
 		
-		if (firstName == null) {
+		if (events.getFirstName().isEmpty()) {
 			
-			firstName = dining.getName();
+			events.setFirstName(dining.getName());
 			
 		}
 		
+		setNameOnPage();
+		
+		setReserveBoolOnPage();
+		
 		browser.loadURL(Main.class.getResource("templates/simple.html").toExternalForm());
-		
-	}
-	
-	public void registerGetFirstName() {
-		
-		browser.registerFunction("GetFirstName", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {				
-				
-				if (firstName == null)
-					return JSValue.create("");
-				else
-					return JSValue.create(firstName);
-				
-			}
-			
-		});
 		
 	}
 	
@@ -695,21 +489,6 @@ public class Main extends Application {
 		
 	}
 	
-	public void registerGetReserveBool() {
-		
-		browser.registerFunction("reservedNextWeek", new BrowserFunction() {
-			
-			@Override
-			public JSValue invoke(JSValue... args) {				
-				
-				return JSValue.create(reservedNextWeek);
-				
-			}
-			
-		});
-		
-	}
-	
 	public long getDayDiff(Date dt1, Date dt2) {
 		
 		long diffInMillies = dt1.getTime() - dt2.getTime();
@@ -720,7 +499,7 @@ public class Main extends Application {
 	
 	public void changeReserveBool(boolean newValue) {
 		
-		if (newValue != reservedNextWeek) {
+		if (newValue != events.getReservedNextWeek()) {
 		
 			if (newValue) {
 				
@@ -753,7 +532,7 @@ public class Main extends Application {
 				
 			}
 		
-			reservedNextWeek = newValue;
+			events.setReservedNextBool(newValue);
 		
 		}
 		
@@ -811,7 +590,7 @@ public class Main extends Application {
 		
 		changeReserveBool(dining.nextWeekIsReserved(5));
     	
-    	if (reservedNextWeek) {
+    	if (events.getReservedNextWeek()) {
     		
     		changeReserveBool(!(getDayDiff(new Date(), getExpDate()) > 0));
     		
@@ -869,7 +648,7 @@ public class Main extends Application {
 			
 		}
 		
-		if (reservedNextWeek) {
+		if (events.getReservedNextWeek()) {
 			
 			lastReserve = new Date();
 			
