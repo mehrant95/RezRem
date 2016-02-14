@@ -29,6 +29,8 @@ import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.JSValue;
 import com.teamdev.jxbrowser.chromium.events.FinishLoadingEvent;
 import com.teamdev.jxbrowser.chromium.events.LoadAdapter;
+import com.teamdev.jxbrowser.chromium.events.ScriptContextEvent;
+import com.teamdev.jxbrowser.chromium.events.ScriptContextListener;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -43,8 +45,6 @@ public class Main extends Application {
 	private Stage primaryStage;
 	
 	private Browser browser;
-	
-	private boolean firstMinimize;
 	
     private TrayIcon trayIcon;
     
@@ -68,8 +68,6 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		
 		this.primaryStage = primaryStage;
-		
-		firstMinimize = true;
 		
 		Platform.setImplicitExit(false);
 		
@@ -95,22 +93,21 @@ public class Main extends Application {
 		
 		events = new Events(browser, trayIcon, dining, this, primaryStage);
 		
-		browser.addLoadListener(new LoadAdapter() {
-		    
+		browser.addScriptContextListener(new ScriptContextListener() {
+			
 			@Override
-		    public void onFinishLoadingFrame(FinishLoadingEvent event) {
-		        
-				if (event.isMainFrame()) {
-		            
+			public void onScriptContextDestroyed(ScriptContextEvent arg0) { }
+			
+			@Override
+			public void onScriptContextCreated(ScriptContextEvent event) {
+				
 					Browser browser = event.getBrowser();
 		            
 					JSValue value = browser.executeJavaScriptAndReturnValue("window");
 		            
 					value.asObject().setProperty("Events", events);
-					
-		        }
 				
-		    }
+			}
 			
 		});
 		
@@ -269,20 +266,6 @@ public class Main extends Application {
 		
     }
 
-    public void showMinimizeMessage() {
-        
-    	if (firstMinimize) {
-            
-    		trayIcon.displayMessage("RezRem",
-                    "RezRem is running in background.",
-                    TrayIcon.MessageType.INFO);
-            
-    		firstMinimize = false;
-        
-    	}
-    	
-    }
-	
 	public void doLogin() {
 		
 		final Task task = new Task();

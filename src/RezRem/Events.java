@@ -133,7 +133,7 @@ public class Events {
 		
 	}
 	
-	public void showMinimizeMessage() {
+	private void showMinimizeMessage() {
         
     	if (firstMinimize) {
             
@@ -182,13 +182,15 @@ public class Events {
 	
 	public void nowReserve() {
 		
-		main.reserve();
+		if (!reservedNextWeek)
+			main.reserve();
 		
 	}
 	
 	public void reserveDone() {
 		
-		main.changeReserveBool(true);
+		if (!reservedNextWeek)
+			main.changeReserveBool(true);
 		
 	}
 	
