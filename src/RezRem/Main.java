@@ -29,6 +29,7 @@ import com.teamdev.jxbrowser.chromium.Browser;
 import com.teamdev.jxbrowser.chromium.JSValue;
 import com.teamdev.jxbrowser.chromium.events.FinishLoadingEvent;
 import com.teamdev.jxbrowser.chromium.events.LoadAdapter;
+import com.teamdev.jxbrowser.chromium.events.ScriptContextAdapter;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextEvent;
 import com.teamdev.jxbrowser.chromium.events.ScriptContextListener;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
@@ -93,10 +94,7 @@ public class Main extends Application {
 		
 		events = new Events(browser, trayIcon, dining, this, primaryStage);
 		
-		browser.addScriptContextListener(new ScriptContextListener() {
-			
-			@Override
-			public void onScriptContextDestroyed(ScriptContextEvent arg0) { }
+		browser.addScriptContextListener(new ScriptContextAdapter() {
 			
 			@Override
 			public void onScriptContextCreated(ScriptContextEvent event) {
