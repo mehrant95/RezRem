@@ -22,7 +22,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javax.imageio.ImageIO;
 
 import com.teamdev.jxbrowser.chromium.Browser;
@@ -35,7 +38,13 @@ import com.teamdev.jxbrowser.chromium.events.ScriptContextListener;
 import com.teamdev.jxbrowser.chromium.javafx.BrowserView;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.application.Platform;
@@ -58,6 +67,10 @@ public class Main extends Application {
     private Date lastReserve;
     
     private Events events;
+    
+    private static double xOffset = 0;
+    
+    private static double yOffset = 0;
     
 	public static void main(String[] args) {
 		
@@ -82,6 +95,10 @@ public class Main extends Application {
 		
 		pane.getChildren().add(browserView);
 		
+		pane.setBackground(new Background(new BackgroundFill(Color.web("rgba(34, 67, 74, 0.9)"), CornerRadii.EMPTY, Insets.EMPTY)));
+		
+		pane.setPadding(new Insets(20, 0, 0, 0));
+		
 		Scene scene = new Scene(pane, 330, 470);
 		
 		primaryStage.initStyle(StageStyle.UNDECORATED);
@@ -99,8 +116,6 @@ public class Main extends Application {
 			@Override
 			public void onScriptContextCreated(ScriptContextEvent event) {
 				
-					Browser browser = event.getBrowser();
-		            
 					JSValue value = browser.executeJavaScriptAndReturnValue("window");
 		            
 					value.asObject().setProperty("Events", events);
@@ -108,6 +123,36 @@ public class Main extends Application {
 			}
 			
 		});
+		
+		pane.setOnMousePressed(new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+
+                System.out.println("mouse pressed");
+
+                xOffset = primaryStage.getX() - event.getScreenX();
+
+                yOffset = primaryStage.getY() - event.getScreenY();
+
+            }
+
+        });
+		
+		pane.setOnMouseDragged(new EventHandler<MouseEvent>() {
+
+            @Override
+            public void handle(MouseEvent event) {
+
+                System.out.println("mouse dragged");
+
+                primaryStage.setX(event.getScreenX() + xOffset);
+
+                primaryStage.setY(event.getScreenY() + yOffset);
+                
+            }
+
+        });
 		
 		settings = new File("src/RezRem/settings");
 		
@@ -141,7 +186,7 @@ public class Main extends Application {
 		if(!config.exists()) {
 			
 			browser.loadURL(Main.class.getResource("templates/login.html").toExternalForm());
-		    
+			
 		}
 		else if (!config.isDirectory()) {
 			
